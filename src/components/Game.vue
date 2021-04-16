@@ -1,19 +1,24 @@
 <template>
-    <div class="playing-field">
-        <transition-group name="animate-card">
-            <template v-for="(card, i) in visibleCards" >
-                <Card :value="card" v-if="card != null" :key="card || i" @click="toggleSelect(i)" :selected="selected.has(i)"/>
-            </template>
-        </transition-group>
+    <div class="game">
+        <div class="playing-field">
+            <transition-group name="animate-card">
+                <template v-for="(card, i) in visibleCards" >
+                    <Card :value="card" v-if="card != null" :key="card || i" @click="toggleSelect(i)" :selected="selected.has(i)"/>
+                </template>
+            </transition-group>
+
+            <!-- TODO: Render the number of remaining cards -->
+        </div>
+
+        <button @click="testRemoveCards">Remove</button>
+        <button @click="submit">Submit</button>
     </div>
-
-    <button @click="testRemoveCards">Remove</button>
-    <button @click="submit">Submit</button>
-
 </template>
 
 <script>
-import {reactive} from 'vue';
+const EMPTY_CARD = 0; // use 0 to represent a lack of card when the deck is empty
+
+import {onMounted, reactive} from 'vue';
 import Card from './Card.vue';
 
 // In-place shuffle, https://stackoverflow.com/questions/2450954/
@@ -34,27 +39,33 @@ export default {
     name: "Game",
     setup() {
         const cards = reactive([]);
-        for (let i=1; i<8; i++) {
-            cards.push(i);
-        }
-        shuffle(cards);
-
         const visibleCards = reactive([]);
-        const selected = reactive(new Set())
+        const selected = reactive(new Set());
 
-        return {cards, visibleCards, selected}
+        return {cards, visibleCards, selected};
     },
     mounted() {
-        this.dealNewCards();
     },
     methods: {
-        dealNewCards() {
+        reset() {
+            if (this.cards.length !== 0 || this.visibleCards.length !== 0) {
+                alert('Something went wrong when resetting');
+                this.cards.splice(0);
+                this.visibleCards.splice(0);
+            }
+
+            for (let i=1; i<8; i++) {
+                this.cards.push(i);
+            }
+            shuffle(this.cards);
             while (this.cards.length && this.visibleCards.length < 7) {
                 this.visibleCards.push(this.cards.pop());
             }
+            console.log(this.cards, this.visibleCards)
         },
         gameOver() {
-            // TODO: Make the last set of cards not count
+            // If there are no cards left in the deck, choosing everything will yield a set.
+            // This is just a clicking race, so don't count it.
             return this.cards.length === 0;
         },
         toggleSelect(index) {
@@ -72,17 +83,21 @@ export default {
         },
         replaceCards(indices) {
             indices.forEach(x => {
-                if (this.visibleCards[x] != 0) {
-                    this.visibleCards.splice(x, 1, this.cards.pop() || 0)
+                if (this.visibleCards[x] != EMPTY_CARD) {
+                    this.visibleCards.splice(x, 1, this.cards.pop() || EMPTY_CARD)
                 }
             })
         },
         submit() {
-            const selectedCards = Array.from(this.selected).map(index => this.visibleCards[index]).filter(x => x !== 0);
+            const selectedCards = Array.from(this.selected).map(index => this.visibleCards[index]).filter(x => x !== EMPTY_CARD);
 
             if (checkSet(selectedCards)) {
                 this.replaceCards(Array.from(this.selected))
                 this.selected.clear()
+
+                if (this.gameOver()) {
+                    this.$emit('gameover')
+                }
             }
             else {
                 console.log('Not a set');
