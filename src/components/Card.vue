@@ -20,9 +20,6 @@ export default {
         const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'purple'];
         return {colors};
     },
-    mounted() {
-        console.log(this.value)
-    }
 }
 </script>
 

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1>Lobby</h1>
+        <h1>Game</h1>
         <button @click="$emit('startgame')">Start game</button>
     </div>
 </template>

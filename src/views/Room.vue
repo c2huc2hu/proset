@@ -22,7 +22,6 @@ export default {
   },
   methods: {
     gameover() {
-      console.log('Game over');
       this.state = GAME_STATES.LOBBY
     },
     startgame() {
@@ -32,9 +31,6 @@ export default {
         this.$refs.game.reset();
       })
     }
-  },
-  updated() {
-    console.log(this.state)
   },
   components: {
     Game,

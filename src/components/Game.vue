@@ -2,13 +2,13 @@
     <div class="game">
         <div class="playing-field">
             <transition-group name="animate-card">
-                <template v-for="(card, i) in visibleCards" >
+                <template v-for="(card, i) in visibleCards">
                     <Card :value="card" v-if="card != null" :key="card || i" @click="toggleSelect(i)" :selected="selected.has(i)"/>
                 </template>
             </transition-group>
 
-            <!-- TODO: Render the number of remaining cards -->
         </div>
+        <p>{{cards.length}} cards remaining</p>
 
         <button @click="testRemoveCards">Remove</button>
         <button @click="submit">Submit</button>
@@ -61,7 +61,6 @@ export default {
             while (this.cards.length && this.visibleCards.length < 7) {
                 this.visibleCards.push(this.cards.pop());
             }
-            console.log(this.cards, this.visibleCards)
         },
         gameOver() {
             // If there are no cards left in the deck, choosing everything will yield a set.
@@ -136,6 +135,6 @@ export default {
 .card {
     width: 25%;
     transition: all 0.5s ease;
-    max-height: 400px;
+    max-height: 40vmin;
 }
 </style>
