@@ -2,11 +2,10 @@
     <div class="playing-field">
         <transition-group name="animate-card">
             <template v-for="(card, i) in visibleCards" >
-                <Card :value="card" v-if="card != null" :key="card" @click="toggleSelect(i)" :selected="selected.has(i)"/>
+                <Card :value="card" v-if="card != null" :key="card || i" @click="toggleSelect(i)" :selected="selected.has(i)"/>
             </template>
         </transition-group>
     </div>
-
 
     <button @click="testRemoveCards">Remove</button>
     <button @click="submit">Submit</button>
@@ -69,15 +68,17 @@ export default {
         testRemoveCards() {
             // TODO: Remove this function
             this.replaceCards([2])
+            console.log(...this.visibleCards)
         },
         replaceCards(indices) {
-            indices.map((x, i) => {
-                this.visibleCards.splice(x, 1, this.cards.pop())
+            indices.forEach(x => {
+                if (this.visibleCards[x] != 0) {
+                    this.visibleCards.splice(x, 1, this.cards.pop() || 0)
+                }
             })
         },
         submit() {
-            const selectedCards = Array.from(this.selected).map(index => this.visibleCards[index]);
-            console.log(selectedCards)
+            const selectedCards = Array.from(this.selected).map(index => this.visibleCards[index]).filter(x => x !== 0);
 
             if (checkSet(selectedCards)) {
                 this.replaceCards(Array.from(this.selected))
@@ -118,8 +119,8 @@ export default {
 }
 
 .card {
+    width: 25%;
     transition: all 0.5s ease;
-    height: 100%;
-    flex-basis: 150px;
+    max-height: 400px;
 }
 </style>
