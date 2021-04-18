@@ -2,7 +2,7 @@
     <div class="score-panel">
         <div class="timer"> {{ timerString }} </div>
         <table class="player-list">
-            <tr v-for="player in sortedPlayers">
+            <tr v-for="player in sortedPlayers" :key="player">
                 <td class="score-panel-cell"> {{player}} </td>
                 <td class="score-panel-cell"> {{scores[player]}} </td>
             </tr>
@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import {computed, reactive, ref} from 'vue';
+import {computed} from 'vue';
 
 // Convert a time like 183 to 03:03
 // https://stackoverflow.com/a/40350003
@@ -34,7 +34,7 @@ export default {
     },
     setup(props) {
         const timerString = computed(() => formatTime(props.elapsedTime / 1000))
-        const sortedPlayers = Object.keys(props.scores).sort(player => scores[player])
+        const sortedPlayers = Object.keys(props.scores).sort(player => props.scores[player])
 
         return {timerString, sortedPlayers}
     },

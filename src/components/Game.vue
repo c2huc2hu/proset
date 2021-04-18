@@ -22,7 +22,7 @@
 <script>
 const EMPTY_CARD = 0; // use 0 to represent a lack of card when the deck is empty
 
-import {onMounted, reactive, ref} from 'vue';
+import {reactive, ref} from 'vue';
 import Card from './Card.vue';
 import ScorePanel from './ScorePanel.vue';
 

@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { ref, nextTick } from 'vue';
+import { ref } from 'vue';
 import Lobby from '@/components/Lobby.vue'
 import Game from '@/components/Game.vue'
 import GameOver from '@/components/GameOver.vue'
@@ -33,9 +33,6 @@ export default {
     },
     startgame() {
       this.state = GAME_STATES.GAME_ACTIVE;
-      // nextTick(() => {
-      //   this.$refs.game.reset();
-      // })
     }
   },
   components: {
