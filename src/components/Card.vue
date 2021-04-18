@@ -8,8 +8,6 @@
 </template>
 
 <script>
-// import {reactive} from 'vue';
-
 export default {
     name: 'Card',
     props: {

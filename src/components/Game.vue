@@ -1,25 +1,31 @@
 <template>
-    <div class="game">
-        <div class="playing-field">
-            <transition-group name="animate-card">
-                <template v-for="(card, i) in visibleCards">
-                    <Card :value="card" v-if="card != null" :key="card || i" @click="toggleSelect(i)" :selected="selected.has(i)"/>
-                </template>
-            </transition-group>
+    <div class="game-container">
+        <div class="game">
+            <div class="playing-field">
+                <transition-group name="animate-card">
+                    <template v-for="(card, i) in visibleCards">
+                        <Card :value="card" v-if="card != null" :key="card || i" @click="toggleSelect(i)" :selected="selected.has(i)"/>
+                    </template>
+                </transition-group>
 
+            </div>
+
+            <p>{{cards.length}} cards remaining</p>
+
+            <button @click="testRemoveCards">Remove a card (testing purposes)</button>
+            <button @click="submit">Submit</button>
         </div>
-        <p>{{cards.length}} cards remaining</p>
-
-        <button @click="testRemoveCards">Remove</button>
-        <button @click="submit">Submit</button>
+        <ScorePanel :scores="scores" :elapsedTime="elapsedTime"/>
     </div>
 </template>
 
 <script>
 const EMPTY_CARD = 0; // use 0 to represent a lack of card when the deck is empty
 
-import {onMounted, reactive} from 'vue';
+import {onMounted, reactive, ref} from 'vue';
 import Card from './Card.vue';
+import ScorePanel from './ScorePanel.vue';
+
 
 // In-place shuffle, https://stackoverflow.com/questions/2450954/
 function shuffle(array) {
@@ -41,10 +47,21 @@ export default {
         const cards = reactive([]);
         const visibleCards = reactive([]);
         const selected = reactive(new Set());
+        const startTime = Date.now();
+        const elapsedTime = ref(0);
 
-        return {cards, visibleCards, selected};
+        const scores = reactive({'me': 0});
+
+        return {cards, visibleCards, selected, startTime, elapsedTime, scores};
     },
     mounted() {
+        this.reset();
+        this.interval = setInterval(() => {
+            this.elapsedTime = (Date.now() - this.startTime);
+        }, 1000);
+    },
+    unmount() {
+        clearInterval(this.interval)
     },
     methods: {
         reset() {
@@ -54,7 +71,7 @@ export default {
                 this.visibleCards.splice(0);
             }
 
-            for (let i=1; i<8; i++) {
+            for (let i=1; i<64; i++) {
                 this.cards.push(i);
             }
             shuffle(this.cards);
@@ -62,9 +79,9 @@ export default {
                 this.visibleCards.push(this.cards.pop());
             }
         },
-        gameOver() {
+        gameIsOver() {
             // If there are no cards left in the deck, choosing everything will yield a set.
-            // This is just a clicking race, so don't count it.
+            // This is just a clicking race, so don't count it and end the game early
             return this.cards.length === 0;
         },
         toggleSelect(index) {
@@ -91,11 +108,12 @@ export default {
             const selectedCards = Array.from(this.selected).map(index => this.visibleCards[index]).filter(x => x !== EMPTY_CARD);
 
             if (checkSet(selectedCards)) {
+                this.scores['me'] += 1;
                 this.replaceCards(Array.from(this.selected))
                 this.selected.clear()
 
-                if (this.gameOver()) {
-                    this.$emit('gameover')
+                if (this.gameIsOver()) {
+                    this.$emit('gameover', this.elapsedTime, this.scores);
                 }
             }
             else {
@@ -105,11 +123,15 @@ export default {
     },
     components: {
         Card,
+        ScorePanel,
     }
 }
 </script>
 
 <style>
+.game-container {
+    display: flex;
+}
 .playing-field {
     display: flex;
     flex-wrap: wrap;
