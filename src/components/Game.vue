@@ -12,7 +12,7 @@
 
             <p>{{cards.length}} cards remaining</p>
 
-            <button @click="testRemoveCards">Remove a card (testing purposes)</button>
+            <button class="wide-button" @click="testRemoveCards">Remove a card (testing purposes)</button>
             <button @click="submit">Submit</button>
         </div>
         <ScorePanel :scores="scores" :elapsedTime="elapsedTime"/>
@@ -43,6 +43,9 @@ function checkSet(cards) {
 
 export default {
     name: "Game",
+    props: {
+        numDots: Number,
+    },
     setup() {
         const cards = reactive([]);
         const visibleCards = reactive([]);
@@ -71,11 +74,11 @@ export default {
                 this.visibleCards.splice(0);
             }
 
-            for (let i=1; i<64; i++) {
+            for (let i=1; i<2**this.numDots; i++) {
                 this.cards.push(i);
             }
             shuffle(this.cards);
-            while (this.cards.length && this.visibleCards.length < 7) {
+            while (this.cards.length && this.visibleCards.length < this.numDots + 1) {
                 this.visibleCards.push(this.cards.pop());
             }
         },
@@ -158,5 +161,9 @@ export default {
     width: 25%;
     transition: all 0.5s ease;
     max-height: 40vmin;
+}
+
+.wide-button {
+    width: 300px;
 }
 </style>

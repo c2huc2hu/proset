@@ -28,4 +28,18 @@
 #nav a.router-link-exact-active {
   color: #42b983;
 }
+
+button {
+    background-color: #4BBF52;
+    color: #333;
+    font-size: 1em;
+    border: none;
+    border-radius: 5px;
+
+    padding: 10px;
+    width: 120px;
+    margin: 0 10px;
+
+    cursor: pointer;
+}
 </style>

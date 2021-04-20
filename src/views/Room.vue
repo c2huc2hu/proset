@@ -1,6 +1,6 @@
 <template>
   <Lobby @startgame="startgame" v-if="state == GAME_STATES.LOBBY"/>
-  <Game @gameover="gameover" v-if="state == GAME_STATES.GAME_ACTIVE" ref="game"/>
+  <Game @gameover="gameover" v-if="state == GAME_STATES.GAME_ACTIVE" :numDots="numDots" ref="game"/>
   <GameOver @rejoinLobby="rejoinLobby" :elapsedTime="elapsedTime" :scores="scores" v-if="state == GAME_STATES.GAME_OVER"/>
 </template>
 
@@ -20,7 +20,8 @@ export default {
   name: 'Room',
   setup() {
     const state = ref(GAME_STATES.LOBBY);
-    return {state, GAME_STATES}
+    const numDots = ref(0)
+    return {numDots, state, GAME_STATES}
   },
   methods: {
     gameover(time, scores) {
@@ -31,8 +32,9 @@ export default {
     rejoinLobby() {
       this.state = GAME_STATES.LOBBY;
     },
-    startgame() {
+    startgame(numDots) {
       this.state = GAME_STATES.GAME_ACTIVE;
+      this.numDots = numDots;
     }
   },
   components: {
