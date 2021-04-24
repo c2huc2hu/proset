@@ -7,7 +7,6 @@
                         <Card :value="card" v-if="card != null" :key="card || i" @click="toggleSelect(i)" :selected="selected.has(i)"/>
                     </template>
                 </transition-group>
-
             </div>
 
             <p>{{cards.length}} cards remaining</p>
@@ -62,9 +61,11 @@ export default {
         this.interval = setInterval(() => {
             this.elapsedTime = (Date.now() - this.startTime);
         }, 1000);
+        this.listener = window.addEventListener('keydown', this.toggleKeySelect)
     },
     unmount() {
         clearInterval(this.interval)
+        window.removeEventListener('keydown', this.listener)
     },
     methods: {
         reset() {
@@ -93,6 +94,26 @@ export default {
             }
             else {
                 this.selected.add(index);
+            }
+        },
+        unselectAll() {
+            this.selected.clear()
+        },
+        toggleKeySelect(event) {
+            if (event.code == 'Escape') {
+                this.unselectAll();
+                event.preventDefault();
+            }
+            else if (event.code == 'Space') {
+                this.submit();
+                event.preventDefault();
+            }
+
+            const keytoIndex = {'Digit1': 0, 'Digit2': 1, 'Digit3': 2, 'Digit4': 3, 'KeyQ': 4, 'KeyW': 5, 'KeyE': 6};
+            const index = keytoIndex[event.code];
+            if (index !== undefined) {
+                this.toggleSelect(index);
+                event.preventDefault();
             }
         },
         testRemoveCards() {
